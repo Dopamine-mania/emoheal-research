@@ -331,18 +331,26 @@ class StudyFlowManager {
         // 使用配置的API基础URL
         const apiUrl = `${API_BASE}/submit`;
         
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 15000);
+        
         try {
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(exportData)
+                body: JSON.stringify(exportData),
+                mode: 'cors',
+                signal: controller.signal
             });
             
+            clearTimeout(t);
+            
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
+                const errorText = await response.text().catch(() => '');
+                console.error('Submit failed', response.status, errorText);
+                throw new Error(`Submit failed: ${response.status}`);
             }
             
             const result = await response.json();
@@ -352,8 +360,9 @@ class StudyFlowManager {
             return true;
             
         } catch (error) {
-            console.error('服务器连接失败:', error);
-            this.showAlert('无法连接服务器，数据仅保存在本地 / Server unavailable, data saved locally only', 'warning');
+            clearTimeout(t);
+            console.error('Network/timeout error during submit', error);
+            this.showAlert(`无法连接服务器: ${error.message} / Server unavailable: ${error.message}`, 'warning');
             return false;
         }
     }
