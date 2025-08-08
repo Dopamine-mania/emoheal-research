@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐疗愈系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #progress {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            display: none;
+        }
+        #error {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffebee;
+            color: #c62828;
+            border-radius: 5px;
+            display: none;
+        }
+        #video-container {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #2196F3;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 音乐疗愈系统</h1>
+        
+        <div>
+            <textarea id="emotionInput" rows="4" placeholder="请描述您的情绪状态..."></textarea>
+            <button id="submitBtn" onclick="startTherapy()">开始疗愈</button>
+        </div>
+
+        <div id="progress">
+            <div id="progressText">正在处理...</div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="error"></div>
+
+        <div id="video-container">
+            <h2>疗愈视频</h2>
+            <video id="videoPlayer" controls></video>
+            <br><br>
+            <button onclick="resetPage()">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+
+        function startTherapy() {
+            const emotionText = document.getElementById('emotionInput').value.trim();
+            if (!emotionText) {
+                showError('请输入您的情绪状态');
+                return;
+            }
+
+            // 禁用按钮
+            document.getElementById('submitBtn').disabled = true;
+            
+            // 显示进度
+            document.getElementById('progress').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('video-container').style.display = 'none';
+
+            // 使用普通POST请求代替SSE
+            fetch('http://127.0.0.1:5000/api/music/search-text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: emotionText,
+                    settings: {
+                        duration: '3min',
+                        max_results: 1
+                    }
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('服务器响应错误');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('收到响应:', data);
+                
+                if (data.success && data.data.segments && data.data.segments.length > 0) {
+                    const video = data.data.segments[0];
+                    const videoPath = video.url || video.video_path || '';
+                    
+                    if (videoPath) {
+                        const videoUrl = `http://127.0.0.1:5000/api/video/${videoPath}`;
+                        playVideo(videoUrl);
+                    } else {
+                        showError('未找到视频文件');
+                    }
+                } else {
+                    showError('未找到匹配的疗愈视频');
+                }
+            })
+            .catch(error => {
+                console.error('错误:', error);
+                showError('请求失败: ' + error.message);
+            })
+            .finally(() => {
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('progress').style.display = 'none';
+            });
+        }
+
+        function playVideo(videoUrl) {
+            console.log('播放视频:', videoUrl);
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.src = videoUrl;
+            
+            document.getElementById('video-container').style.display = 'block';
+            document.getElementById('progress').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            
+            // 自动播放
+            videoPlayer.play().catch(e => {
+                console.log('自动播放失败，需要用户手动点击播放');
+            });
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '❌ ' + message;
+            errorDiv.style.display = 'block';
+        }
+
+        function resetPage() {
+            document.getElementById('emotionInput').value = '';
+            document.getElementById('video-container').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('videoPlayer').src = '';
+        }
+
+        function updateProgress(progress, message) {
+            document.getElementById('progressText').textContent = message;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+    </script>
+</body>
+</html>

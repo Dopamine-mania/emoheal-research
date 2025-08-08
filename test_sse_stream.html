@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE Stream测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .event-log {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 20px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .event-item {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .event-item.error {
+            color: red;
+        }
+        .event-item.success {
+            color: green;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>SSE Stream 测试</h1>
+    <button onclick="testSSE()">测试SSE流</button>
+    <button onclick="clearLog()">清空日志</button>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div id="progressText">进度: 0%</div>
+    
+    <div class="event-log" id="eventLog">
+        <div class="event-item">等待开始测试...</div>
+    </div>
+
+    <script>
+        const eventLog = document.getElementById('eventLog');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const item = document.createElement('div');
+            item.className = `event-item ${type}`;
+            item.textContent = `[${time}] ${message}`;
+            eventLog.appendChild(item);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+        
+        function clearLog() {
+            eventLog.innerHTML = '<div class="event-item">日志已清空</div>';
+            progressFill.style.width = '0%';
+            progressText.textContent = '进度: 0%';
+        }
+        
+        async function testSSE() {
+            log('开始测试SSE流...');
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/music/search-with-progress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream',
+                    },
+                    body: JSON.stringify({
+                        query: '头晕想吐',
+                        settings: {
+                            duration: '3min',
+                            max_results: 10
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                log('连接成功，开始读取流...');
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) {
+                        log('流已结束', 'info');
+                        if (buffer.trim()) {
+                            log(`最后的缓冲区数据: ${buffer}`, 'info');
+                        }
+                        break;
+                    }
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    
+                    for (const line of lines) {
+                        if (line.trim().startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.trim().substring(6));
+                                log(`收到事件: ${JSON.stringify(data)}`);
+                                
+                                // 更新进度条
+                                if (data.progress !== undefined) {
+                                    progressFill.style.width = `${data.progress}%`;
+                                    progressText.textContent = `进度: ${data.progress}% - ${data.message}`;
+                                }
+                                
+                                // 检查完成状态
+                                if (data.step === 'completed') {
+                                    log('检索完成！', 'success');
+                                    if (data.data && data.data.segments) {
+                                        log(`返回了 ${data.data.segments.length} 首音乐`, 'success');
+                                    }
+                                }
+                                
+                                // 检查错误状态
+                                if (data.step === 'error') {
+                                    log(`错误: ${data.message}`, 'error');
+                                }
+                            } catch (error) {
+                                log(`解析错误: ${error.message} - Line: ${line}`, 'error');
+                            }
+                        } else if (line.trim()) {
+                            log(`非data行: ${line}`, 'info');
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                log(`错误: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

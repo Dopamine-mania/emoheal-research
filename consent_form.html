@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmoHeal Study - Consent Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="qmul-header">
+        <div class="qmul-logo">Queen Mary University of London</div>
+        <div class="qmul-subtitle">School of Electronic Engineering and Computer Science</div>
+    </div>
+
+    <div class="container">
+        <div class="progress-steps">
+            <div class="step completed">1</div>
+            <div class="step completed">2</div>
+            <div class="step current">3</div>
+            <div class="step pending">4</div>
+            <div class="step pending">5</div>
+            <div class="step pending">6</div>
+        </div>
+
+        <div class="content-card">
+            <h1>Informed Consent Form</h1>
+            <h2 style="text-align: center; color: #666;">知情同意书</h2>
+            
+            <div class="alert alert-info">
+                <strong>Study:</strong> EmoHeal: An Experiential Study of an AI System for Personalized Therapeutic Video Generation<br>
+                <strong>Researchers:</strong> Xinchen Wan, Huan Zhang<br>
+                <strong>Ethics Reference:</strong> QMERC20.565.DSEECS25.045
+            </div>
+
+            <p style="font-size: 1.1rem; font-weight: 500; color: #2c3e50; margin-bottom: 30px;">
+                Before participating in this study, please read each statement carefully and check the boxes 
+                to indicate your agreement. You must agree to all statements to participate.
+                <br><br>
+                在参与本研究之前，请仔细阅读每项声明并勾选方框表示同意。您必须同意所有声明才能参与。
+            </p>
+
+            <form data-study-form="consent">
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consent1" name="consent1" class="consent-checkbox" required>
+                        <label for="consent1" class="checkbox-text">
+                            <strong>1. Voluntary Participation / 自愿参与</strong><br>
+                            I understand that my participation in this research is voluntary and that I am free to withdraw 
+                            at any time without giving any reason and without there being any negative consequences.
+                            <br><br>
+                            我明白我参与这项研究是自愿的，我可以随时退出而无需给出任何理由，也不会有任何负面后果。
+                        </label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consent2" name="consent2" class="consent-checkbox" required>
+                        <label for="consent2" class="checkbox-text">
+                            <strong>2. Study Understanding / 研究理解</strong><br>
+                            I have read and understood the participant information sheet and have had the opportunity 
+                            to ask questions about the study. I understand what participation involves.
+                            <br><br>
+                            我已阅读并理解参与者信息表，并有机会询问有关研究的问题。我了解参与涉及什么。
+                        </label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consent3" name="consent3" class="consent-checkbox" required>
+                        <label for="consent3" class="checkbox-text">
+                            <strong>3. Data Collection and Use / 数据收集和使用</strong><br>
+                            I consent to the collection and use of my data for the purposes of this research study. 
+                            I understand that my data will be anonymized and used only for research purposes.
+                            <br><br>
+                            我同意为本研究目的收集和使用我的数据。我了解我的数据将被匿名化，仅用于研究目的。
+                        </label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consent4" name="consent4" class="consent-checkbox" required>
+                        <label for="consent4" class="checkbox-text">
+                            <strong>4. Data Storage and Retention / 数据存储和保留</strong><br>
+                            I understand that my anonymized data will be stored securely on Queen Mary University systems 
+                            and will be retained until January 2026, after which it will be securely destroyed.
+                            <br><br>
+                            我理解我的匿名数据将安全存储在伦敦大学玛丽女王学院系统中，并保留至2026年1月，之后将被安全销毁。
+                        </label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consent5" name="consent5" class="consent-checkbox" required>
+                        <label for="consent5" class="checkbox-text">
+                            <strong>5. Data Access and Sharing / 数据访问和共享</strong><br>
+                            I understand that only the research team will have access to my data, and that any research 
+                            outputs will not contain information that could identify me personally.
+                            <br><br>
+                            我理解只有研究团队才能访问我的数据，任何研究输出都不会包含能够识别我个人身份的信息。
+                        </label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consent6" name="consent6" class="consent-checkbox" required>
+                        <label for="consent6" class="checkbox-text">
+                            <strong>6. Right to Withdraw / 退出权利</strong><br>
+                            I understand that I can withdraw from the study at any time, including during the session, 
+                            and can request that my data be deleted if it has not yet been anonymized.
+                            <br><br>
+                            我理解我可以随时退出研究，包括在会话期间，如果数据尚未匿名化，我可以要求删除我的数据。
+                        </label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consent7" name="consent7" class="consent-checkbox" required>
+                        <label for="consent7" class="checkbox-text">
+                            <strong>7. Informed Consent / 知情同意</strong><br>
+                            I confirm that I am 18 years of age or older and that I give my informed consent to participate 
+                            in this research study under the conditions outlined above.
+                            <br><br>
+                            我确认我已年满18岁，并在上述条件下给予知情同意参与本研究。
+                        </label>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>Important Reminders / 重要提醒:</strong>
+                    <ul style="margin-top: 10px; margin-bottom: 0;">
+                        <li>This is a low-risk research study / 这是一项低风险研究</li>
+                        <li>You can pause or stop the experience at any time / 您可以随时暂停或停止体验</li>
+                        <li>If you experience any discomfort, please withdraw immediately / 如果您感到任何不适，请立即退出</li>
+                        <li>Contact the research team with any concerns: x.wan@qmul.ac.uk / 如有任何疑虑，请联系研究团队</li>
+                    </ul>
+                </div>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <p style="margin-bottom: 15px; font-weight: 500;">
+                            By proceeding, I confirm that I have read, understood, and agree to all the above statements.
+                            <br>
+                            通过继续，我确认我已阅读、理解并同意上述所有声明。
+                        </p>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 0;">
+                            Date and time of consent will be automatically recorded.
+                            <br>
+                            同意的日期和时间将自动记录。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" data-navigate-to="participant_info">
+                        Back / 返回
+                    </button>
+                    <button type="submit" class="btn btn-primary consent-submit" disabled>
+                        I Agree - Start Therapy Experience / 我同意 - 开始治疗体验
+                    </button>
+                </div>
+            </form>
+
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 0;">
+                    <strong>Questions about your rights as a research participant?</strong><br>
+                    Contact Queen Mary Ethics of Research Committee: research-ethics@qmul.ac.uk
+                    <br><br>
+                    <strong>对您作为研究参与者的权利有疑问？</strong><br>
+                    联系伦敦大学玛丽女王学院研究伦理委员会：research-ethics@qmul.ac.uk
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="study_flow.js"></script>
+</body>
+</html>

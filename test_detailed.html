@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>详细调试测试</title>
+    <style>
+        body { font-family: Arial; margin: 50px; background: #1a1a1a; color: white; }
+        button { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px; }
+        button:hover { background: #2563eb; }
+        #log { background: #111; padding: 20px; border-radius: 10px; height: 600px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .info { color: #74c0fc; }
+        .warning { color: #ffd93d; }
+    </style>
+</head>
+<body>
+    <h1>详细调试测试</h1>
+    
+    <button onclick="testFrontendSession()">测试前端会话创建流程</button>
+    <button onclick="clearLog()">清空日志</button>
+    
+    <h3>测试日志</h3>
+    <div id="log"></div>
+    
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const className = type;
+            logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        async function testFrontendSession() {
+            log('开始测试前端会话创建流程...', 'info');
+            
+            try {
+                // 模拟前端的API调用
+                log('准备调用 TherapySessionService.createSession...', 'info');
+                
+                // 直接通过fetch调用后端API
+                const response = await fetch('http://127.0.0.1:5000/api/music/search-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: '我感到有些焦虑',
+                        settings: {
+                            duration: '1min',
+                            max_results: 5
+                        }
+                    })
+                });
+                
+                log(`响应状态: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                
+                const data = await response.json();
+                log(`响应数据: ${JSON.stringify(data, null, 2)}`, 'info');
+                
+                // 检查响应格式
+                if (data.success) {
+                    log('✅ API调用成功', 'success');
+                    
+                    // 检查返回的数据结构
+                    if (data.data && data.data.segments) {
+                        log(`返回了 ${data.data.segments.length} 首音乐`, 'success');
+                    } else {
+                        log('⚠️ 响应格式不符合预期', 'warning');
+                    }
+                } else {
+                    log(`❌ API返回错误: ${data.error}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ 错误: ${error.message}`, 'error');
+                console.error('完整错误:', error);
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.onload = () => {
+            log('页面加载完成，准备测试...', 'info');
+        };
+    </script>
+</body>
+</html>

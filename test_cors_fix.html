@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CORS修复测试</title>
+    <style>
+        body { font-family: Arial; margin: 50px; background: #1a1a1a; color: white; }
+        button { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px; }
+        button:hover { background: #2563eb; }
+        #log { background: #111; padding: 20px; border-radius: 10px; height: 600px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .info { color: #74c0fc; }
+        .warning { color: #ffd93d; }
+    </style>
+</head>
+<body>
+    <h1>CORS修复测试</h1>
+    
+    <button onclick="testBackendDirect()">直接测试后端API</button>
+    <button onclick="testWithCORS()">测试CORS配置</button>
+    <button onclick="clearLog()">清空日志</button>
+    
+    <h3>测试日志</h3>
+    <div id="log"></div>
+    
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const className = type;
+            logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        async function testBackendDirect() {
+            log('测试直接连接后端...', 'info');
+            
+            try {
+                // 先测试健康检查
+                log('1. 测试健康检查端点...', 'info');
+                const healthResponse = await fetch('http://127.0.0.1:5000/api/health');
+                log(`健康检查响应: ${healthResponse.status} ${healthResponse.statusText}`, healthResponse.ok ? 'success' : 'error');
+                
+                // 测试情感分析
+                log('2. 测试情感分析API...', 'info');
+                const emotionResponse = await fetch('http://127.0.0.1:5000/api/emotion/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ text: '我感到有些焦虑' })
+                });
+                
+                log(`情感分析响应: ${emotionResponse.status} ${emotionResponse.statusText}`, emotionResponse.ok ? 'success' : 'error');
+                
+                if (emotionResponse.ok) {
+                    const emotionData = await emotionResponse.json();
+                    log(`情感分析结果: ${JSON.stringify(emotionData, null, 2)}`, 'success');
+                }
+                
+            } catch (error) {
+                log(`❌ 错误详情: ${error.name}: ${error.message}`, 'error');
+                console.error('完整错误:', error);
+            }
+        }
+        
+        async function testWithCORS() {
+            log('测试CORS配置...', 'info');
+            
+            try {
+                // 测试OPTIONS预检请求
+                log('发送OPTIONS预检请求...', 'info');
+                const optionsResponse = await fetch('http://127.0.0.1:5000/api/music/search-text', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'content-type'
+                    }
+                });
+                
+                log(`OPTIONS响应: ${optionsResponse.status}`, optionsResponse.ok ? 'success' : 'error');
+                log(`CORS头信息:`, 'info');
+                log(`- Access-Control-Allow-Origin: ${optionsResponse.headers.get('Access-Control-Allow-Origin')}`, 'info');
+                log(`- Access-Control-Allow-Methods: ${optionsResponse.headers.get('Access-Control-Allow-Methods')}`, 'info');
+                log(`- Access-Control-Allow-Headers: ${optionsResponse.headers.get('Access-Control-Allow-Headers')}`, 'info');
+                
+                // 测试实际POST请求
+                log('\n发送实际POST请求...', 'info');
+                const postResponse = await fetch('http://127.0.0.1:5000/api/music/search-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: '我感到有些焦虑',
+                        settings: {
+                            duration: '1min',
+                            max_results: 5
+                        }
+                    })
+                });
+                
+                log(`POST响应: ${postResponse.status} ${postResponse.statusText}`, postResponse.ok ? 'success' : 'error');
+                
+                if (postResponse.ok) {
+                    const data = await postResponse.json();
+                    log(`响应数据: ${JSON.stringify(data, null, 2)}`, 'success');
+                }
+                
+            } catch (error) {
+                log(`❌ 错误详情: ${error.name}: ${error.message}`, 'error');
+                console.error('完整错误:', error);
+            }
+        }
+        
+        // 页面加载时显示提示
+        window.onload = () => {
+            log('页面加载完成', 'info');
+            log('请打开浏览器开发者工具（F12）查看网络请求详情', 'warning');
+        };
+    </script>
+</body>
+</html>

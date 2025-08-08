@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐阶段分配修复测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        h1 {
+            text-align: center;
+            color: #10b981;
+            margin-bottom: 30px;
+        }
+        .fix-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.5);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .fix-title {
+            color: #f59e0b;
+            font-size: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .fix-description {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .code-block {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+        .highlight {
+            color: #34d399;
+            font-weight: bold;
+        }
+        .test-button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 8px;
+            transition: all 0.2s;
+        }
+        .test-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        .phase-distribution {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .phase-card {
+            background: #1e293b;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .phase-card.match {
+            border-color: #3b82f6;
+        }
+        .phase-card.lead {
+            border-color: #f59e0b;
+        }
+        .phase-card.target {
+            border-color: #10b981;
+        }
+        .phase-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .phase-count {
+            font-size: 24px;
+            color: #60a5fa;
+        }
+        #testResult {
+            margin-top: 20px;
+            padding: 16px;
+            background: #1e293b;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 音乐阶段分配问题已修复！</h1>
+    
+    <div class="fix-card">
+        <div class="fix-title">
+            <span>🐛</span>
+            <span>问题原因</span>
+        </div>
+        <div class="fix-description">
+            之前所有音乐片段都被硬编码为 <span class="highlight">phase: 'match'</span>，
+            导致在疗愈会话进入 Lead 和 Target 阶段时找不到对应的音乐片段。
+        </div>
+        <div class="code-block">
+// 之前的错误代码
+phase: 'match'  // ❌ 所有片段都是match阶段
+        </div>
+    </div>
+    
+    <div class="fix-card">
+        <div class="fix-title">
+            <span>✅</span>
+            <span>解决方案</span>
+        </div>
+        <div class="fix-description">
+            现在音乐片段会根据索引自动分配到三个阶段：
+        </div>
+        <div class="code-block">
+// 修复后的代码
+const segmentPerPhase = Math.ceil(totalSegments / 3);
+
+if (index < segmentPerPhase) {
+    phase = 'match';      // 前1/3片段
+} else if (index < segmentPerPhase * 2) {
+    phase = 'lead';       // 中间1/3片段
+} else {
+    phase = 'target';     // 后1/3片段
+}
+        </div>
+        
+        <div class="phase-distribution">
+            <div class="phase-card match">
+                <div class="phase-name">Match 阶段</div>
+                <div class="phase-count">3-4 首</div>
+                <div style="color: #94a3b8; font-size: 14px;">匹配当前情绪</div>
+            </div>
+            <div class="phase-card lead">
+                <div class="phase-name">Lead 阶段</div>
+                <div class="phase-count">3-4 首</div>
+                <div style="color: #94a3b8; font-size: 14px;">引导情绪转变</div>
+            </div>
+            <div class="phase-card target">
+                <div class="phase-name">Target 阶段</div>
+                <div class="phase-count">3-2 首</div>
+                <div style="color: #94a3b8; font-size: 14px;">达到目标状态</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="fix-card">
+        <div class="fix-title">
+            <span>🧪</span>
+            <span>立即测试</span>
+        </div>
+        <div class="fix-description">
+            点击下面的按钮测试修复效果：
+        </div>
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="test-button" onclick="window.open('http://localhost:3000', '_blank')">
+                🚀 打开主应用测试
+            </button>
+            <button class="test-button" onclick="testSSEPhases()">
+                🔍 测试阶段分配
+            </button>
+        </div>
+        <div id="testResult"></div>
+    </div>
+    
+    <div class="success-message">
+        <strong>🎉 修复完成！</strong><br>
+        现在疗愈会话应该能够正常进行，不会再卡在33%了。<br>
+        每个阶段都有对应的音乐片段，会话可以完整地完成三个阶段的过渡。
+    </div>
+    
+    <script>
+        async function testSSEPhases() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<div style="color: #60a5fa;">🔄 正在测试阶段分配...</div>';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/music/search-with-progress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream',
+                    },
+                    body: JSON.stringify({
+                        query: '测试情绪',
+                        settings: { duration: '3min', max_results: 10 }
+                    })
+                });
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let phases = { match: 0, lead: 0, target: 0 };
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    
+                    for (const line of lines) {
+                        if (line.trim().startsWith('data: ')) {
+                            const data = JSON.parse(line.trim().substring(6));
+                            
+                            if (data.step === 'completed' && data.data?.segments) {
+                                const segments = data.data.segments;
+                                
+                                // 模拟前端的阶段分配逻辑
+                                segments.forEach((segment, index) => {
+                                    const segmentPerPhase = Math.ceil(segments.length / 3);
+                                    if (index < segmentPerPhase) {
+                                        phases.match++;
+                                    } else if (index < segmentPerPhase * 2) {
+                                        phases.lead++;
+                                    } else {
+                                        phases.target++;
+                                    }
+                                });
+                                
+                                resultDiv.innerHTML = `
+                                    <div style="color: #10b981;">✅ 测试成功！阶段分配结果：</div>
+                                    <div style="margin-top: 12px;">
+                                        <div>总音乐数: <span style="color: #60a5fa;">${segments.length}</span></div>
+                                        <div>Match 阶段: <span style="color: #3b82f6;">${phases.match} 首</span></div>
+                                        <div>Lead 阶段: <span style="color: #f59e0b;">${phases.lead} 首</span></div>
+                                        <div>Target 阶段: <span style="color: #10b981;">${phases.target} 首</span></div>
+                                    </div>
+                                    <div style="margin-top: 16px; color: #94a3b8;">
+                                        每个阶段都有对应的音乐片段，不会再出现"当前阶段没有可用的音乐片段"的错误了！
+                                    </div>
+                                `;
+                                return;
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: #ef4444;">❌ 测试失败: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>极简音乐疗愈测试 - 5001端口</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+        button { background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+        #result { margin-top: 20px; padding: 20px; background: #e8f5e9; border-radius: 5px; }
+        .error { background: #ffebee !important; color: #c62828; }
+        video { width: 100%; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 音乐疗愈系统</h1>
+        <p>当前尝试连接端口：<strong id="port">5001</strong></p>
+        
+        <button onclick="testPort(5000)">测试5000端口</button>
+        <button onclick="testPort(5001)">测试5001端口</button>
+        
+        <input type="text" id="emotion" placeholder="输入您的情绪，如：头晕想吐" />
+        <button onclick="searchMusic()">查找疗愈音乐</button>
+        
+        <div id="result" style="display:none;"></div>
+        <video id="video" controls style="display:none;"></video>
+    </div>
+
+    <script>
+        let currentPort = 5001;
+        
+        function testPort(port) {
+            currentPort = port;
+            document.getElementById('port').textContent = port;
+            
+            fetch(`http://127.0.0.1:${port}/api/health`)
+                .then(res => res.json())
+                .then(data => {
+                    showResult(`端口 ${port} 连接成功！`, false);
+                })
+                .catch(err => {
+                    showResult(`端口 ${port} 连接失败：${err.message}`, true);
+                });
+        }
+        
+        function searchMusic() {
+            const emotion = document.getElementById('emotion').value;
+            if (!emotion) {
+                showResult('请输入情绪', true);
+                return;
+            }
+            
+            showResult('搜索中...', false);
+            
+            fetch(`http://127.0.0.1:${currentPort}/api/music/search-text`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: emotion,
+                    settings: { duration: '3min', max_results: 1 }
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('响应数据:', data);
+                if (data.success && data.data?.segments?.length > 0) {
+                    const video = data.data.segments[0];
+                    const videoPath = video.url || video.video_path;
+                    if (videoPath) {
+                        const videoUrl = `http://127.0.0.1:${currentPort}/api/video/${videoPath}`;
+                        document.getElementById('video').src = videoUrl;
+                        document.getElementById('video').style.display = 'block';
+                        showResult('找到视频！', false);
+                    } else {
+                        showResult('未找到视频路径', true);
+                    }
+                } else {
+                    showResult('未找到匹配的音乐', true);
+                }
+            })
+            .catch(err => {
+                showResult(`请求失败：${err.message}`, true);
+            });
+        }
+        
+        function showResult(msg, isError) {
+            const result = document.getElementById('result');
+            result.textContent = msg;
+            result.style.display = 'block';
+            result.className = isError ? 'error' : '';
+        }
+        
+        // 页面加载时测试默认端口
+        window.onload = () => testPort(5001);
+    </script>
+</body>
+</html>

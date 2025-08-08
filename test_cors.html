@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试CORS</title>
+</head>
+<body>
+    <h1>测试CORS请求</h1>
+    <button onclick="testCors()">测试API</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testCors() {
+            const result = document.getElementById('result');
+            
+            try {
+                // 测试健康检查
+                const healthRes = await fetch('http://127.0.0.1:5000/api/health');
+                const healthData = await healthRes.json();
+                result.textContent += `健康检查: ${JSON.stringify(healthData, null, 2)}\n\n`;
+                
+                // 测试SSE端点的OPTIONS
+                const optionsRes = await fetch('http://127.0.0.1:5000/api/music/search-with-progress', {
+                    method: 'OPTIONS'
+                });
+                result.textContent += `OPTIONS响应: ${optionsRes.status}\n`;
+                result.textContent += `CORS头: ${optionsRes.headers.get('Access-Control-Allow-Origin')}\n\n`;
+                
+                // 测试POST请求
+                const postRes = await fetch('http://127.0.0.1:5000/api/music/search-with-progress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: '测试',
+                        settings: { duration: '3min', max_results: 1 }
+                    })
+                });
+                result.textContent += `POST响应: ${postRes.status}\n`;
+                
+            } catch (error) {
+                result.textContent += `错误: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>

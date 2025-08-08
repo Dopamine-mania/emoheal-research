@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐疗愈系统 - 增强版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
+            background-color: #FDF6E4;
+            color: #5D4E37;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* 背景渐变 */
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                #FDF6E4 0%, 
+                #FFE5CC 25%, 
+                #FFD4B3 50%, 
+                #FFC299 75%, 
+                #FFB380 100%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        /* 语言切换器 */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #FFD4B3;
+            color: #5D4E37;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #FFB380, #FF9966);
+            color: white;
+            border-color: #FF9966;
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: rgba(255, 212, 179, 0.6);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #5D4E37;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #9D8B7D;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.3s forwards;
+        }
+
+        /* 输入区域 */
+        .input-section {
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #7D6B5D;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #FFD4B3;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #5D4E37;
+            font-size: 1.1rem;
+            resize: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            min-height: 120px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #FFB380;
+            box-shadow: 0 0 0 3px rgba(255, 179, 128, 0.2);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #FFB380, #FF9966);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 153, 102, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 153, 102, 0.4);
+        }
+
+        button:disabled {
+            background: #E0D5C7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 情绪分析结果阶段 */
+        .emotion-analysis {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            border: 2px solid #FFD4B3;
+        }
+
+        .emotion-title {
+            font-size: 1.3rem;
+            color: #5D4E37;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .emotion-details {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .emotion-item {
+            text-align: center;
+            padding: 1rem;
+            margin: 0.5rem;
+            background: rgba(255, 179, 128, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 179, 128, 0.3);
+            min-width: 120px;
+        }
+
+        .emotion-name {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #7D6B5D;
+            margin-bottom: 0.5rem;
+        }
+
+        .emotion-intensity {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #FF9966;
+        }
+
+        /* 音乐推荐阶段 */
+        .music-recommendation {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            border: 2px solid #FFD4B3;
+        }
+
+        .music-title {
+            font-size: 1.3rem;
+            color: #5D4E37;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .music-info {
+            background: rgba(255, 179, 128, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 179, 128, 0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .music-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .music-detail-item {
+            text-align: left;
+        }
+
+        .music-label {
+            font-size: 0.9rem;
+            color: #9D8B7D;
+            margin-bottom: 0.3rem;
+        }
+
+        .music-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #5D4E37;
+        }
+
+        /* 继续按钮 */
+        .continue-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #FFB380, #FF9966);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 153, 102, 0.4);
+        }
+
+        /* 呼吸光环 */
+        .breathing-circle {
+            display: none;
+            width: 200px;
+            height: 200px;
+            margin: 3rem auto;
+            position: relative;
+        }
+
+        .circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(255, 179, 128, 0.3) 0%, 
+                rgba(255, 153, 102, 0.1) 50%, 
+                transparent 70%);
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        .circle:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .circle:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(0.8);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* 视频播放区域 */
+        .video-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        video {
+            width: 100%;
+            border-radius: 20px;
+            background-color: #1a1a1a;
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(253, 246, 228, 0.1) 100%);
+            pointer-events: none;
+        }
+
+        /* 重新开始按钮 */
+        .restart-btn {
+            margin-top: 2rem;
+            padding: 12px 30px;
+            background: transparent;
+            color: #7D6B5D;
+            border: 2px solid #FFD4B3;
+            font-size: 1rem;
+        }
+
+        .restart-btn:hover {
+            background: rgba(255, 212, 179, 0.2);
+        }
+
+        /* 长按退出提示 */
+        .exit-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: #C5B5A5;
+            font-size: 0.8rem;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+
+        .exit-hint:hover {
+            opacity: 0.6;
+        }
+
+        /* 长按进度环 */
+        .long-press-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .long-press-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 179, 128, 0.3);
+            border-top-color: #FFB380;
+            animation: none;
+            transition: transform 0.3s ease;
+        }
+
+        .long-press-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #7D6B5D;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* 呼吸提示文字 */
+        .breathing-hint {
+            display: none;
+            color: #9D8B7D;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes longPressRotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-gradient"></div>
+    
+    <!-- 语言切换器 -->
+    <div class="language-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('zh')">中文</button>
+        <button class="lang-btn" onclick="switchLanguage('en')">English</button>
+    </div>
+    
+    <div class="container">
+        <h1 id="mainTitle">🎵 音乐疗愈空间</h1>
+        <div class="subtitle" id="subtitle">让音乐治愈您的心灵</div>
+        
+        <!-- 长按退出提示 -->
+        <div class="exit-hint" id="exitHint">长按屏幕3秒可随时退出</div>
+        
+        <!-- 长按进度指示器 -->
+        <div class="long-press-indicator" id="longPressIndicator">
+            <div class="long-press-circle" id="longPressCircle"></div>
+            <div class="long-press-text" id="longPressText">退出中...</div>
+        </div>
+        
+        <!-- 输入阶段 -->
+        <div class="input-section" id="inputSection">
+            <label class="input-label" id="inputLabel">请描述您现在的感受</label>
+            <textarea 
+                id="emotionInput" 
+                rows="4" 
+                placeholder="例如：我感到焦虑，需要放松..."
+            ></textarea>
+            <br>
+            <button id="submitBtn" onclick="startAnalysis()">开始分析情绪</button>
+        </div>
+
+        <!-- 情绪分析结果阶段 -->
+        <div class="emotion-analysis" id="emotionAnalysis">
+            <div class="emotion-title" id="emotionTitle">🧠 情绪分析结果</div>
+            <div class="emotion-details" id="emotionDetails">
+                <!-- 动态生成情绪项目 -->
+            </div>
+            <button class="continue-btn" id="continueToMusic" onclick="showMusicRecommendation()">查看音乐推荐</button>
+        </div>
+
+        <!-- 音乐推荐阶段 -->
+        <div class="music-recommendation" id="musicRecommendation">
+            <div class="music-title" id="musicTitle">🎵 为您推荐的疗愈音乐</div>
+            <div class="music-info" id="musicInfo">
+                <div class="music-details" id="musicDetails">
+                    <!-- 动态生成音乐信息 -->
+                </div>
+                <div class="music-description" id="musicDescription">
+                    <!-- 音乐描述 -->
+                </div>
+            </div>
+            <button class="continue-btn" id="startTherapy" onclick="startMusicTherapy()">开始疗愈之旅</button>
+        </div>
+
+        <!-- 呼吸光环阶段 -->
+        <div class="breathing-circle" id="breathingCircle">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+        <div class="breathing-hint" id="breathingHint">
+            跟随光环的节奏深呼吸，让身心放松...
+        </div>
+
+        <!-- 视频播放阶段 -->
+        <div class="video-section" id="videoSection">
+            <div class="video-container">
+                <video id="videoPlayer" controls preload="auto"></video>
+                <div class="video-overlay"></div>
+            </div>
+            <button class="restart-btn" id="restartBtn" onclick="restart()">重新开始</button>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="study_flow.js"></script>
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+        let currentPhase = 'input';
+        let currentLanguage = 'zh';
+        let emotionData = null;
+        let musicData = null;
+        
+        // 检查是否从实验流程进入
+        let isFromStudyFlow = false;
+        try {
+            if (studyFlow && studyFlow.currentStep === 'therapy') {
+                isFromStudyFlow = true;
+                console.log('疗愈系统已从实验流程启动');
+            }
+        } catch (e) {
+            // 如果没有studyFlow对象，则为独立访问
+            console.log('独立访问疗愈系统');
+        }
+
+        // GPT-5建议的艺术家规范化辅助函数
+        const LIBRARY_ARTIST_KEYS = new Set(['疗愈音乐库', '治愈音乐库', 'Therapy Music Library']);
+
+        function getLibraryArtistName(lang) {
+            return lang === 'zh' ? '疗愈音乐库' : 'Therapy Music Library';
+        }
+
+        function computeArtistDisplay(rawArtist, lang) {
+            const raw = (rawArtist || '').trim();
+            if (!raw) return getLibraryArtistName(lang);
+            if (LIBRARY_ARTIST_KEYS.has(raw)) return getLibraryArtistName(lang);
+            return raw; // 真实艺术家名称保持不变
+        }
+
+        // 多语言文本
+        const translations = {
+            zh: {
+                mainTitle: '🎵 音乐疗愈空间',
+                subtitle: '让音乐治愈您的心灵',
+                inputLabel: '请描述您现在的感受',
+                placeholder: '例如：我感到焦虑，需要放松...',
+                submitBtn: '开始分析情绪',
+                emotionTitle: '🧠 情绪分析结果',
+                continueToMusic: '查看音乐推荐',
+                musicTitle: '🎵 为您推荐的疗愈音乐',
+                startTherapy: '开始疗愈之旅',
+                breathingHint: '跟随光环的节奏深呼吸，让身心放松...',
+                restartBtn: '重新开始',
+                exitHint: '长按屏幕3秒可随时退出',
+                longPressText: '退出中...',
+                exitConfirm: '是否确认退出疗愈空间？',
+                inputRequired: '请描述您的感受',
+                analysisInProgress: '正在分析您的情绪...',
+                analysisError: '情绪分析失败，请重试',
+                musicFetchError: '获取音乐推荐失败，请重试',
+                connectionError: '连接失败，请稍后重试',
+                noMusicFound: '未找到匹配的音乐',
+                noVideoPath: '未找到合适的疗愈音乐',
+                primaryEmotion: '主要情绪',
+                secondaryEmotion: '次要情绪',
+                overallIntensity: '总体强度',
+                musicType: '音乐类型',
+                matchScore: '匹配度',
+                duration: '时长',
+                artist: '演奏者'
+            },
+            en: {
+                mainTitle: '🎵 Music Therapy Space',
+                subtitle: 'Let music heal your soul',
+                inputLabel: 'Please describe how you feel right now',
+                placeholder: 'For example: I feel anxious and need to relax...',
+                submitBtn: 'Start Emotion Analysis',
+                emotionTitle: '🧠 Emotion Analysis Results',
+                continueToMusic: 'View Music Recommendations',
+                musicTitle: '🎵 Recommended Therapeutic Music for You',
+                startTherapy: 'Start Therapy Journey',
+                breathingHint: 'Follow the rhythm of the light rings and breathe deeply, let your mind and body relax...',
+                restartBtn: 'Start Over',
+                exitHint: 'Long press screen for 3 seconds to exit anytime',
+                longPressText: 'Exiting...',
+                exitConfirm: 'Are you sure you want to exit the therapy space?',
+                inputRequired: 'Please describe your feelings',
+                analysisInProgress: 'Analyzing your emotions...',
+                analysisError: 'Emotion analysis failed, please try again',
+                musicFetchError: 'Failed to get music recommendations, please try again',
+                connectionError: 'Connection failed, please try again later',
+                noMusicFound: 'No matching music found',
+                noVideoPath: 'No suitable therapeutic music found',
+                primaryEmotion: 'Primary Emotion',
+                secondaryEmotion: 'Secondary Emotion',
+                overallIntensity: 'Overall Intensity',
+                musicType: 'Music Type',
+                matchScore: 'Match Score',
+                duration: 'Duration',
+                artist: 'Artist'
+            }
+        };
+
+        // 语言切换功能
+        function switchLanguage(lang) {
+            console.group('switchLanguage');
+            console.log('[switchLanguage] previous:', currentLanguage, '-> next:', lang);
+            currentLanguage = lang;
+            
+            // 更新按钮状态 - 不依赖全局event对象
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                const txt = (btn.textContent || '').trim();
+                if ((lang === 'zh' && txt === '中文') || (lang === 'en' && txt === 'English')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            try {
+                updatePageText();
+            } catch (e) {
+                console.error('[switchLanguage] updatePageText threw:', e);
+            }
+            console.groupEnd();
+        }
+
+        function updatePageText() {
+            console.group('updatePageText');
+            console.log('[updatePageText] currentLanguage:', currentLanguage);
+            
+            const texts = translations[currentLanguage];
+            if (!texts) {
+                console.warn('[updatePageText] missing translations for', currentLanguage);
+                console.groupEnd();
+                return;
+            }
+
+            const updates = [
+                { id: 'mainTitle', prop: 'textContent', key: 'mainTitle' },
+                { id: 'subtitle', prop: 'textContent', key: 'subtitle' },
+                { id: 'inputLabel', prop: 'textContent', key: 'inputLabel' },
+                { id: 'emotionInput', prop: 'placeholder', key: 'placeholder' },
+                { id: 'submitBtn', prop: 'textContent', key: 'submitBtn' },
+                { id: 'emotionTitle', prop: 'textContent', key: 'emotionTitle' },
+                { id: 'continueToMusic', prop: 'textContent', key: 'continueToMusic' },
+                { id: 'musicTitle', prop: 'textContent', key: 'musicTitle' },
+                { id: 'startTherapy', prop: 'textContent', key: 'startTherapy' },
+                { id: 'breathingHint', prop: 'textContent', key: 'breathingHint' },
+                { id: 'restartBtn', prop: 'textContent', key: 'restartBtn' },
+                { id: 'exitHint', prop: 'textContent', key: 'exitHint' },
+                { id: 'longPressText', prop: 'textContent', key: 'longPressText' }
+            ];
+
+            for (const { id, prop, key } of updates) {
+                const el = document.getElementById(id);
+                if (!el) {
+                    console.warn('[updatePageText] missing element id:', id);
+                    continue;
+                }
+                if (texts[key]) {
+                    el[prop] = texts[key];
+                }
+            }
+
+            if (musicData) {
+                console.log('[updatePageText] musicData present, refreshing music display');
+                try {
+                    updateMusicDisplay();
+                } catch (e) {
+                    console.error('[updatePageText] updateMusicDisplay threw:', e);
+                }
+            } else {
+                console.log('[updatePageText] no musicData, skipping music refresh');
+            }
+            console.groupEnd();
+        }
+
+        function updateMusicDisplay() {
+            console.group('updateMusicDisplay');
+            if (!musicData) {
+                console.warn('[updateMusicDisplay] called with no musicData');
+                console.groupEnd();
+                return;
+            }
+
+            const musicDetails = document.getElementById('musicDetails');
+            if (!musicDetails) {
+                console.error('[updateMusicDisplay] #musicDetails not found');
+                console.groupEnd();
+                return;
+            }
+
+            const lang = currentLanguage || 'zh';
+            const texts = translations[lang] || {};
+            const rawArtist = musicData.artist;
+            const artistText = computeArtistDisplay(rawArtist, lang);
+
+            console.table({
+                lang,
+                rawArtist,
+                artistText,
+                isLibraryArtist: LIBRARY_ARTIST_KEYS.has((rawArtist || '').trim()) || !(rawArtist || '').trim()
+            });
+
+            const titleText = musicData.title || (lang === 'zh' ? '疗愈音乐' : 'Therapeutic Music');
+            const matchScoreText = (musicData.matchScore != null && !Number.isNaN(musicData.matchScore))
+                ? `${(musicData.matchScore * 100).toFixed(1)}%`
+                : (lang === 'zh' ? '—' : '—');
+            const durationText = musicData.duration || (lang === 'zh' ? '3分钟' : '3 minutes');
+
+            musicDetails.innerHTML = `
+                <div class="music-detail-item">
+                    <div class="music-label">${texts.musicType || (lang === 'zh' ? '类型' : 'Type')}</div>
+                    <div class="music-value">${titleText}</div>
+                </div>
+                <div class="music-detail-item">
+                    <div class="music-label">${texts.artist || (lang === 'zh' ? '演奏者' : 'Artist')}</div>
+                    <div class="music-value">${artistText}</div>
+                </div>
+                <div class="music-detail-item">
+                    <div class="music-label">${texts.matchScore || (lang === 'zh' ? '匹配度' : 'Match')}</div>
+                    <div class="music-value">${matchScoreText}</div>
+                </div>
+                <div class="music-detail-item">
+                    <div class="music-label">${texts.duration || (lang === 'zh' ? '时长' : 'Duration')}</div>
+                    <div class="music-value">${durationText}</div>
+                </div>
+            `;
+
+            console.log('[updateMusicDisplay] DOM updated for language:', lang, 'artistText:', artistText);
+            console.groupEnd();
+        }
+
+        async function startAnalysis() {
+            const emotion = document.getElementById('emotionInput').value.trim();
+            if (!emotion) {
+                alert(translations[currentLanguage].inputRequired);
+                return;
+            }
+
+            // 禁用按钮并显示加载状态
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = translations[currentLanguage].analysisInProgress;
+            
+            try {
+                // 使用现有的emotion/vector端点获取情绪分析
+                const response = await fetch(`${API_BASE}/api/emotion/vector`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: emotion })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 解析情绪向量数据
+                    const vector = data.data.vector;
+                    const vectorSum = data.data.sum;
+                    
+                    // 手动计算主要情绪（简化版本）
+                    const emotionNames = [
+                        'admiration', 'amusement', 'anger', 'annoyance', 'approval',
+                        'caring', 'confusion', 'curiosity', 'desire', 'disappointment',
+                        'disapproval', 'disgust', 'embarrassment', 'excitement', 'fear',
+                        'gratitude', 'grief', 'joy', 'love', 'nervousness',
+                        'optimism', 'pride', 'realization', 'relief', 'remorse',
+                        'sadness', 'surprise'
+                    ];
+                    
+                    const emotionNamesCN = {
+                        'admiration': '钦佩', 'amusement': '愉悦', 'anger': '愤怒', 
+                        'annoyance': '烦恼', 'approval': '赞同', 'caring': '关怀', 
+                        'confusion': '困惑', 'curiosity': '好奇', 'desire': '渴望', 
+                        'disappointment': '失望', 'disapproval': '反对', 'disgust': '厌恶',
+                        'embarrassment': '尴尬', 'excitement': '兴奋', 'fear': '恐惧',
+                        'gratitude': '感激', 'grief': '悲伤', 'joy': '喜悦', 
+                        'love': '爱', 'nervousness': '紧张', 'optimism': '乐观',
+                        'pride': '骄傲', 'realization': '领悟', 'relief': '宽慰',
+                        'remorse': '懊悔', 'sadness': '悲伤', 'surprise': '惊讶'
+                    };
+                    
+                    // 创建情绪数组并排序
+                    const emotions = vector.map((value, index) => ({
+                        name: emotionNames[index],
+                        nameCN: emotionNamesCN[emotionNames[index]] || emotionNames[index],
+                        intensity: value
+                    })).sort((a, b) => b.intensity - a.intensity);
+                    
+                    emotionData = {
+                        text: emotion,
+                        primary_emotion: currentLanguage === 'zh' ? emotions[0].nameCN : emotions[0].name,
+                        primary_intensity: emotions[0].intensity,
+                        secondary_emotion: currentLanguage === 'zh' ? emotions[1].nameCN : emotions[1].name,
+                        secondary_intensity: emotions[1].intensity,
+                        vector_sum: vectorSum,
+                        top_3_emotions: emotions.slice(0, 3)
+                    };
+                    
+                    // 隐藏输入区域，显示情绪分析结果
+                    showEmotionAnalysis();
+                } else {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                console.error('情绪分析错误:', error);
+                alert(translations[currentLanguage].analysisError);
+                // 重置按钮状态
+                submitBtn.disabled = false;
+                submitBtn.textContent = translations[currentLanguage].submitBtn;
+            }
+        }
+
+        function showEmotionAnalysis() {
+            currentPhase = 'emotion';
+            document.getElementById('inputSection').style.display = 'none';
+            
+            // 填充情绪分析结果
+            if (emotionData) {
+                const emotionDetails = document.getElementById('emotionDetails');
+                const texts = translations[currentLanguage];
+                
+                // 清空现有内容
+                emotionDetails.innerHTML = '';
+                
+                // 创建情绪展示项目
+                const emotions = [
+                    { name: texts.primaryEmotion, value: emotionData.primary_emotion || 'N/A', intensity: emotionData.primary_intensity || 0 },
+                    { name: texts.secondaryEmotion, value: emotionData.secondary_emotion || 'N/A', intensity: emotionData.secondary_intensity || 0 },
+                    { name: texts.overallIntensity, value: (emotionData.vector_sum || 0).toFixed(3), intensity: emotionData.vector_sum || 0 }
+                ];
+                
+                emotions.forEach(emotion => {
+                    const item = document.createElement('div');
+                    item.className = 'emotion-item';
+                    item.innerHTML = `
+                        <div class="emotion-name">${emotion.name}</div>
+                        <div class="emotion-intensity">${emotion.value}</div>
+                    `;
+                    emotionDetails.appendChild(item);
+                });
+            }
+            
+            document.getElementById('emotionAnalysis').style.display = 'block';
+        }
+
+        async function showMusicRecommendation() {
+            console.group('showMusicRecommendation');
+            try {
+                // 获取音乐推荐
+                const emotion = document.getElementById('emotionInput').value.trim();
+                const response = await fetch(`${API_BASE}/api/music/search-text`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: emotion,
+                        settings: {
+                            duration: '3min',
+                            max_results: 1
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.data?.segments?.length > 0) {
+                    musicData = data.data.segments[0];
+                    console.log('[showMusicRecommendation] received musicData:', {
+                        artist: musicData?.artist,
+                        title: musicData?.title,
+                        matchScore: musicData?.matchScore,
+                        duration: musicData?.duration
+                    });
+                    
+                    // 隐藏情绪分析，显示音乐推荐
+                    currentPhase = 'music';
+                    document.getElementById('emotionAnalysis').style.display = 'none';
+                    
+                    // 使用统一的规范化渲染函数
+                    updateMusicDisplay();
+                    
+                    const musicDescription = document.getElementById('musicDescription');
+                    musicDescription.innerHTML = `
+                        <p style="color: #7D6B5D; font-size: 0.95rem; line-height: 1.5; margin-top: 1rem;">
+                            ${currentLanguage === 'zh' 
+                                ? `根据您的情绪状态，我们为您精选了这首疗愈音乐。它将帮助您放松心情，缓解压力，带来内心的平静与安宁。`
+                                : `Based on your emotional state, we have carefully selected this therapeutic music for you. It will help you relax, relieve stress, and bring inner peace and tranquility.`
+                            }
+                        </p>
+                    `;
+                    
+                    document.getElementById('musicRecommendation').style.display = 'block';
+                    
+                    console.log('[showMusicRecommendation] initial render complete, lang:', currentLanguage);
+                } else {
+                    console.warn('[showMusicRecommendation] no segments or request failed', data);
+                    throw new Error('No music found');
+                }
+            } catch (error) {
+                console.error('音乐推荐错误:', error);
+                alert(translations[currentLanguage].musicFetchError);
+            } finally {
+                console.groupEnd();
+            }
+        }
+
+        function startMusicTherapy() {
+            // 隐藏音乐推荐，进入呼吸光环阶段
+            currentPhase = 'breathing';
+            document.getElementById('musicRecommendation').style.display = 'none';
+            document.getElementById('breathingCircle').style.display = 'block';
+            document.getElementById('breathingHint').style.display = 'block';
+            
+            // 3秒后进入视频播放
+            setTimeout(() => {
+                if (musicData) {
+                    const videoUrl = `${API_BASE}/api/video/${musicData.url || musicData.video_path}`;
+                    showVideoPhase(videoUrl);
+                }
+            }, 3000);
+        }
+
+        function showVideoPhase(videoUrl) {
+            currentPhase = 'video';
+            document.getElementById('breathingCircle').style.display = 'none';
+            document.getElementById('breathingHint').style.display = 'none';
+            
+            // 设置视频源
+            const video = document.getElementById('videoPlayer');
+            
+            // 预加载视频元数据
+            video.preload = 'auto';
+            
+            // 监听视频加载事件
+            video.onloadedmetadata = () => {
+                console.log('视频元数据加载完成');
+                // 尝试跳过前几帧
+                if (video.duration > 3) {
+                    video.currentTime = 0.1; // 跳过最开始的0.1秒
+                }
+            };
+            
+            video.oncanplay = () => {
+                console.log('视频可以播放');
+                // 显示视频区域并淡入
+                const videoSection = document.getElementById('videoSection');
+                videoSection.style.display = 'block';
+                
+                // 触发淡入动画
+                setTimeout(() => {
+                    videoSection.style.opacity = '1';
+                    video.play().catch(e => console.log('需要用户手动播放'));
+                }, 100);
+            };
+            
+            // 设置视频源
+            video.src = videoUrl;
+        }
+
+        function restart() {
+            if (isFromStudyFlow) {
+                // 从实验流程进入的，完成疗愈体验后跳转到问卷
+                const confirmComplete = confirm(
+                    '您是否已完成疗愈体验？点击确定将进入问卷调查。\n' +
+                    'Have you completed the therapy experience? Click OK to proceed to the questionnaire.'
+                );
+                if (confirmComplete) {
+                    markTherapyComplete();
+                    proceedToStep('questionnaire');
+                    return;
+                }
+            }
+            
+            // 重置所有状态
+            currentPhase = 'input';
+            emotionData = null;
+            musicData = null;
+            
+            document.getElementById('emotionInput').value = '';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').textContent = translations[currentLanguage].submitBtn;
+            
+            // 隐藏所有阶段
+            document.getElementById('emotionAnalysis').style.display = 'none';
+            document.getElementById('musicRecommendation').style.display = 'none';
+            document.getElementById('breathingCircle').style.display = 'none';
+            document.getElementById('breathingHint').style.display = 'none';
+            document.getElementById('videoSection').style.display = 'none';
+            document.getElementById('videoSection').style.opacity = '0';
+            
+            // 显示输入阶段
+            document.getElementById('inputSection').style.display = 'block';
+            
+            // 停止视频
+            document.getElementById('videoPlayer').pause();
+            document.getElementById('videoPlayer').src = '';
+        }
+
+        // 长按退出功能
+        let longPressTimer = null;
+        let isLongPressing = false;
+        const LONG_PRESS_DURATION = 3000; // 3秒
+
+        // 阻止默认的长按行为
+        document.addEventListener('selectstart', (e) => {
+            if (isLongPressing) {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // 触摸设备支持
+        document.addEventListener('touchstart', handleLongPressStart, { passive: false });
+        document.addEventListener('touchend', handleLongPressEnd);
+        document.addEventListener('touchmove', handleLongPressEnd);
+
+        // 鼠标设备支持
+        document.addEventListener('mousedown', handleLongPressStart);
+        document.addEventListener('mouseup', handleLongPressEnd);
+        document.addEventListener('mouseleave', handleLongPressEnd);
+        document.addEventListener('mousemove', (e) => {
+            if (isLongPressing && (Math.abs(e.movementX) > 5 || Math.abs(e.movementY) > 5)) {
+                handleLongPressEnd();
+            }
+        });
+
+        function handleLongPressStart(e) {
+            // 防止在输入框、按钮和语言切换器上触发
+            if (e.target.tagName === 'TEXTAREA' || 
+                e.target.tagName === 'BUTTON' || 
+                e.target.classList.contains('lang-btn')) {
+                return;
+            }
+
+            e.preventDefault();
+            isLongPressing = true;
+
+            // 显示进度指示器
+            const indicator = document.getElementById('longPressIndicator');
+            const circle = document.getElementById('longPressCircle');
+            
+            indicator.style.display = 'block';
+            circle.style.animation = `longPressRotate ${LONG_PRESS_DURATION}ms linear`;
+
+            longPressTimer = setTimeout(() => {
+                if (isLongPressing) {
+                    // 触发退出
+                    performSafeExit();
+                }
+            }, LONG_PRESS_DURATION);
+        }
+
+        function handleLongPressEnd() {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            
+            isLongPressing = false;
+
+            // 隐藏进度指示器
+            const indicator = document.getElementById('longPressIndicator');
+            const circle = document.getElementById('longPressCircle');
+            
+            indicator.style.display = 'none';
+            circle.style.animation = 'none';
+        }
+
+        function performSafeExit() {
+            // 停止所有音视频
+            const video = document.getElementById('videoPlayer');
+            if (video) {
+                video.pause();
+                video.src = '';
+            }
+
+            if (isFromStudyFlow) {
+                // 从实验流程进入的，询问是否要退出整个研究或返回问卷
+                const exitChoice = confirm(
+                    '您想要：\n' +
+                    '确定 - 完成疗愈体验并进入问卷\n' +
+                    '取消 - 返回疗愈界面\n\n' +
+                    'Would you like to:\n' +
+                    'OK - Complete therapy and proceed to questionnaire\n' +
+                    'Cancel - Return to therapy interface'
+                );
+                
+                if (exitChoice) {
+                    markTherapyComplete();
+                    proceedToStep('questionnaire');
+                } else {
+                    // 用户选择继续疗愈体验
+                }
+            } else {
+                // 独立访问的原有逻辑
+                const confirmExit = confirm(translations[currentLanguage].exitConfirm);
+                if (confirmExit) {
+                    restart();
+                }
+            }
+
+            handleLongPressEnd();
+        }
+
+        // 实验流程集成 - 检测视频结束
+        let videoCompletionCheckStarted = false;
+        
+        function startVideoCompletionCheck() {
+            if (videoCompletionCheckStarted) return;
+            videoCompletionCheckStarted = true;
+            
+            const video = document.getElementById('videoPlayer');
+            if (!video) return;
+            
+            video.addEventListener('ended', () => {
+                console.log('视频播放完成，准备进入问卷阶段');
+                
+                // 延迟3秒后显示进入问卷的选项
+                setTimeout(() => {
+                    if (confirm('疗愈体验已完成！是否继续填写研究问卷？\nTherapy experience completed! Would you like to continue to the research questionnaire?')) {
+                        // 检查是否有studyFlow（实验流程）
+                        if (typeof markTherapyComplete === 'function') {
+                            markTherapyComplete();
+                            window.location.href = 'questionnaire.html';
+                        } else {
+                            // 如果没有实验流程，显示重新开始选项
+                            const continueToQuestionnaire = confirm('您想要：\n点击"确定"重新开始疗愈体验\n点击"取消"结束会话\n\nWould you like to:\nClick "OK" to restart therapy experience\nClick "Cancel" to end session');
+                            if (continueToQuestionnaire) {
+                                restart();
+                            }
+                        }
+                    }
+                }, 3000);
+            });
+            
+            // 也监听视频进度，当到达90%时开始准备
+            video.addEventListener('timeupdate', () => {
+                if (video.duration > 0) {
+                    const progress = video.currentTime / video.duration;
+                    if (progress >= 0.9) {
+                        console.log('视频即将结束，准备问卷过渡');
+                    }
+                }
+            });
+        }
+        
+        // 修改showVideoPhase函数以包含完成检查
+        const originalShowVideoPhase = showVideoPhase;
+        showVideoPhase = function(videoUrl) {
+            originalShowVideoPhase.call(this, videoUrl);
+            startVideoCompletionCheck();
+        };
+
+        // 页面加载完成
+        window.addEventListener('load', () => {
+            console.log('增强版音乐疗愈系统已准备就绪 / Enhanced Music Therapy System Ready');
+            console.log('提示：长按屏幕任意位置3秒可安全退出 / Tip: Long press anywhere for 3 seconds to exit safely');
+            
+            // 如果来自实验流程，显示额外信息
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromExperiment = urlParams.get('from') === 'experiment';
+            if (fromExperiment) {
+                console.log('从实验流程进入，疗愈完成后将自动进入问卷');
+                
+                // 可选：添加一个小的提示条
+                const experimentNotice = document.createElement('div');
+                experimentNotice.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(153, 0, 51, 0.9);
+                    color: white;
+                    padding: 8px 20px;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    z-index: 2000;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                `;
+                experimentNotice.textContent = '研究模式 Research Mode';
+                document.body.appendChild(experimentNotice);
+                
+                // 淡入显示，3秒后淡出
+                setTimeout(() => experimentNotice.style.opacity = '1', 100);
+                setTimeout(() => experimentNotice.style.opacity = '0', 3000);
+                setTimeout(() => experimentNotice.remove(), 3300);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐疗愈系统 - 治疗界面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+            background-color: #FDF6E4;
+            color: #5D4E37;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* 背景渐变 */
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                #FDF6E4 0%, 
+                #FFE5CC 25%, 
+                #FFD4B3 50%, 
+                #FFC299 75%, 
+                #FFB380 100%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #5D4E37;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        /* 输入区域 */
+        .input-section {
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #FFD4B3;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #5D4E37;
+            font-size: 1.1rem;
+            resize: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #FFB380;
+            box-shadow: 0 0 0 3px rgba(255, 179, 128, 0.2);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #FFB380, #FF9966);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 153, 102, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 153, 102, 0.4);
+        }
+
+        button:disabled {
+            background: #E0D5C7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 文本反馈阶段 */
+        .feedback-text {
+            display: none;
+            font-size: 1.2rem;
+            color: #7D6B5D;
+            margin: 2rem 0;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        /* 呼吸光环 */
+        .breathing-circle {
+            display: none;
+            width: 200px;
+            height: 200px;
+            margin: 3rem auto;
+            position: relative;
+        }
+
+        .circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(255, 179, 128, 0.3) 0%, 
+                rgba(255, 153, 102, 0.1) 50%, 
+                transparent 70%);
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        .circle:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .circle:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(0.8);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* 视频播放区域 */
+        .video-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        video {
+            width: 100%;
+            border-radius: 20px;
+            background-color: #1a1a1a;
+            /* 预加载设置 */
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(253, 246, 228, 0.1) 100%);
+            pointer-events: none;
+        }
+
+        /* 重新开始按钮 */
+        .restart-btn {
+            margin-top: 2rem;
+            padding: 12px 30px;
+            background: transparent;
+            color: #7D6B5D;
+            border: 2px solid #FFD4B3;
+            font-size: 1rem;
+        }
+
+        .restart-btn:hover {
+            background: rgba(255, 212, 179, 0.2);
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 呼吸提示文字 */
+        .breathing-hint {
+            display: none;
+            color: #9D8B7D;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+        }
+
+        /* 长按退出提示 */
+        .exit-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: #C5B5A5;
+            font-size: 0.8rem;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+
+        .exit-hint:hover {
+            opacity: 0.6;
+        }
+
+        /* 长按进度环 */
+        .long-press-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .long-press-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 179, 128, 0.3);
+            border-top-color: #FFB380;
+            animation: none;
+            transition: transform 0.3s ease;
+        }
+
+        .long-press-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #7D6B5D;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        @keyframes longPressRotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-gradient"></div>
+    
+    <div class="container">
+        <h1>🎵 音乐疗愈空间</h1>
+        
+        <!-- 长按退出提示 -->
+        <div class="exit-hint">长按屏幕3秒可随时退出</div>
+        
+        <!-- 长按进度指示器 -->
+        <div class="long-press-indicator" id="longPressIndicator">
+            <div class="long-press-circle" id="longPressCircle"></div>
+            <div class="long-press-text">退出中...</div>
+        </div>
+        
+        <!-- 输入阶段 -->
+        <div class="input-section" id="inputSection">
+            <textarea 
+                id="emotionInput" 
+                rows="4" 
+                placeholder="请描述您现在的感受..."
+            ></textarea>
+            <br>
+            <button id="submitBtn" onclick="startTherapy()">开始疗愈之旅</button>
+        </div>
+
+        <!-- 文本反馈阶段 -->
+        <div class="feedback-text" id="feedbackText">
+            我理解您现在的感受，正在为您寻找合适的音乐...
+        </div>
+
+        <!-- 呼吸光环阶段 -->
+        <div class="breathing-circle" id="breathingCircle">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+        <div class="breathing-hint" id="breathingHint">
+            跟随光环的节奏深呼吸，让身心放松...
+        </div>
+
+        <!-- 视频播放阶段 -->
+        <div class="video-section" id="videoSection">
+            <div class="video-container">
+                <video id="videoPlayer" controls></video>
+                <div class="video-overlay"></div>
+            </div>
+            <button class="restart-btn" onclick="restart()">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+        let currentPhase = 'input';
+
+        function startTherapy() {
+            const emotion = document.getElementById('emotionInput').value.trim();
+            if (!emotion) {
+                alert('请描述您的感受');
+                return;
+            }
+
+            // 禁用按钮
+            document.getElementById('submitBtn').disabled = true;
+            
+            // 进入文本反馈阶段
+            showFeedbackPhase();
+
+            // 延迟后进入呼吸光环阶段
+            setTimeout(() => {
+                showBreathingPhase();
+                
+                // 同时开始请求后端
+                fetchMusic(emotion);
+            }, 2000);
+        }
+
+        function showFeedbackPhase() {
+            currentPhase = 'feedback';
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('feedbackText').style.display = 'block';
+        }
+
+        function showBreathingPhase() {
+            currentPhase = 'breathing';
+            document.getElementById('feedbackText').style.display = 'none';
+            document.getElementById('breathingCircle').style.display = 'block';
+            document.getElementById('breathingHint').style.display = 'block';
+        }
+
+        function showVideoPhase(videoUrl) {
+            currentPhase = 'video';
+            document.getElementById('breathingCircle').style.display = 'none';
+            document.getElementById('breathingHint').style.display = 'none';
+            
+            // 设置视频源
+            const video = document.getElementById('videoPlayer');
+            
+            // 预加载视频元数据
+            video.preload = 'auto';
+            
+            // 监听视频加载事件
+            video.onloadedmetadata = () => {
+                console.log('视频元数据加载完成');
+                // 尝试跳过前几帧
+                if (video.duration > 3) {
+                    video.currentTime = 0.1; // 跳过最开始的0.1秒
+                }
+            };
+            
+            video.oncanplay = () => {
+                console.log('视频可以播放');
+                // 显示视频区域并淡入
+                const videoSection = document.getElementById('videoSection');
+                videoSection.style.display = 'block';
+                
+                // 触发淡入动画
+                setTimeout(() => {
+                    videoSection.style.opacity = '1';
+                    video.play().catch(e => console.log('需要用户手动播放'));
+                }, 100);
+            };
+            
+            // 设置视频源
+            video.src = videoUrl;
+        }
+
+        async function fetchMusic(emotion) {
+            try {
+                const response = await fetch(`${API_BASE}/api/music/search-text`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: emotion,
+                        settings: {
+                            duration: '3min',
+                            max_results: 1
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.data?.segments?.length > 0) {
+                    const video = data.data.segments[0];
+                    const videoPath = video.url || video.video_path;
+                    
+                    if (videoPath) {
+                        // 等待至少4秒（一个呼吸周期）再切换到视频
+                        setTimeout(() => {
+                            const videoUrl = `${API_BASE}/api/video/${videoPath}`;
+                            showVideoPhase(videoUrl);
+                        }, 4000);
+                    } else {
+                        handleError('未找到合适的疗愈音乐');
+                    }
+                } else {
+                    handleError('未找到匹配的音乐');
+                }
+            } catch (error) {
+                handleError('连接失败，请稍后重试');
+            }
+        }
+
+        function handleError(message) {
+            alert(message);
+            restart();
+        }
+
+        function restart() {
+            // 重置所有状态
+            currentPhase = 'input';
+            document.getElementById('emotionInput').value = '';
+            document.getElementById('submitBtn').disabled = false;
+            
+            // 隐藏所有阶段
+            document.getElementById('feedbackText').style.display = 'none';
+            document.getElementById('breathingCircle').style.display = 'none';
+            document.getElementById('breathingHint').style.display = 'none';
+            document.getElementById('videoSection').style.display = 'none';
+            document.getElementById('videoSection').style.opacity = '0';
+            
+            // 显示输入阶段
+            document.getElementById('inputSection').style.display = 'block';
+            
+            // 停止视频
+            document.getElementById('videoPlayer').pause();
+            document.getElementById('videoPlayer').src = '';
+        }
+
+        // 长按退出功能
+        let longPressTimer = null;
+        let isLongPressing = false;
+        const LONG_PRESS_DURATION = 3000; // 3秒
+
+        // 阻止默认的长按行为（如文本选择）
+        document.addEventListener('selectstart', (e) => {
+            if (isLongPressing) {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // 触摸设备支持
+        document.addEventListener('touchstart', handleLongPressStart, { passive: false });
+        document.addEventListener('touchend', handleLongPressEnd);
+        document.addEventListener('touchmove', handleLongPressEnd);
+
+        // 鼠标设备支持
+        document.addEventListener('mousedown', handleLongPressStart);
+        document.addEventListener('mouseup', handleLongPressEnd);
+        document.addEventListener('mouseleave', handleLongPressEnd);
+        document.addEventListener('mousemove', (e) => {
+            if (isLongPressing && e.movementX > 5 || e.movementY > 5) {
+                handleLongPressEnd();
+            }
+        });
+
+        function handleLongPressStart(e) {
+            // 防止在输入框和按钮上触发
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') {
+                return;
+            }
+
+            e.preventDefault();
+            isLongPressing = true;
+
+            // 显示进度指示器
+            const indicator = document.getElementById('longPressIndicator');
+            const circle = document.getElementById('longPressCircle');
+            
+            indicator.style.display = 'block';
+            circle.style.animation = `longPressRotate ${LONG_PRESS_DURATION}ms linear`;
+
+            longPressTimer = setTimeout(() => {
+                if (isLongPressing) {
+                    // 触发退出
+                    performSafeExit();
+                }
+            }, LONG_PRESS_DURATION);
+        }
+
+        function handleLongPressEnd() {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            
+            isLongPressing = false;
+
+            // 隐藏进度指示器
+            const indicator = document.getElementById('longPressIndicator');
+            const circle = document.getElementById('longPressCircle');
+            
+            indicator.style.display = 'none';
+            circle.style.animation = 'none';
+        }
+
+        function performSafeExit() {
+            // 停止所有音视频
+            const video = document.getElementById('videoPlayer');
+            if (video) {
+                video.pause();
+                video.src = '';
+            }
+
+            // 显示退出确认
+            const confirmExit = confirm('是否确认退出疗愈空间？');
+            
+            if (confirmExit) {
+                // 重置到初始状态
+                restart();
+                
+                // 可选：关闭页面或跳转
+                // window.close(); // 某些浏览器可能不支持
+                // window.location.href = 'about:blank';
+            }
+
+            handleLongPressEnd();
+        }
+
+        // 页面加载完成
+        window.addEventListener('load', () => {
+            console.log('音乐疗愈系统已准备就绪');
+            console.log('提示：长按屏幕任意位置3秒可安全退出');
+        });
+    </script>
+</body>
+</html>

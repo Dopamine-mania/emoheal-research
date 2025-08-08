@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Test</title>
+</head>
+<body>
+    <h1>简单测试</h1>
+    <button onclick="testApp()">测试主应用</button>
+    <pre id="log"></pre>
+    
+    <script>
+        function testApp() {
+            // 直接打开主应用并检查控制台
+            window.open('http://localhost:3000', '_blank');
+            document.getElementById('log').textContent = '请查看新窗口的浏览器控制台（F12）查看错误信息';
+        }
+    </script>
+</body>
+</html>

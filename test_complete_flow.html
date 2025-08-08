@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完整流程测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #1a1a2e;
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 音乐疗愈系统 - 完整流程测试</h1>
+    
+    <div class="test-section">
+        <h2>测试说明</h2>
+        <p>现在进度更新问题已经修复，请按照以下步骤测试完整流程：</p>
+        <ol>
+            <li>打开主应用：<a href="http://localhost:3000" target="_blank" style="color: #4CAF50;">http://localhost:3000</a></li>
+            <li>输入您的情绪状态（如："头晕想吐"）</li>
+            <li>选择疗愈时长（3分钟）</li>
+            <li>观察进度条是否正常更新</li>
+            <li>检查是否成功进入疗愈界面</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>修复的问题</h2>
+        <ul>
+            <li class="success">✅ 修复了端口配置错误（5001 → 5000）</li>
+            <li class="success">✅ 修复了CORS和CSP配置问题</li>
+            <li class="success">✅ 修复了SSE流处理逻辑</li>
+            <li class="success">✅ 添加了进度完成检测</li>
+            <li class="success">✅ 优化了状态转换时机</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>预期行为</h2>
+        <ul>
+            <li>进度条应该从0%逐步增长到100%</li>
+            <li>每个处理步骤都应该显示对应的消息</li>
+            <li>完成后应该自动跳转到疗愈界面</li>
+            <li>音乐应该开始播放</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>快速测试</h2>
+        <button onclick="testBackend()">测试后端API</button>
+        <button onclick="testSSE()">测试SSE流</button>
+        <button onclick="window.open('http://localhost:3000', '_blank')">打开主应用</button>
+        
+        <div id="testLog" class="log"></div>
+    </div>
+    
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('testLog');
+            const time = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : (type === 'success' ? 'success' : '');
+            logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        async function testBackend() {
+            log('测试后端API...');
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/health');
+                const data = await response.json();
+                log(`后端状态: ${data.data.status}`, 'success');
+            } catch (error) {
+                log(`后端错误: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSSE() {
+            log('测试SSE流...');
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/music/search-with-progress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream',
+                    },
+                    body: JSON.stringify({
+                        query: '测试情绪',
+                        settings: { duration: '3min', max_results: 10 }
+                    })
+                });
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let eventCount = 0;
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    
+                    for (const line of lines) {
+                        if (line.trim().startsWith('data: ')) {
+                            eventCount++;
+                            const data = JSON.parse(line.trim().substring(6));
+                            log(`SSE事件 #${eventCount}: ${data.step} - ${data.message}`);
+                            
+                            if (data.step === 'completed') {
+                                log('SSE流完成！', 'success');
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                log(`SSE错误: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

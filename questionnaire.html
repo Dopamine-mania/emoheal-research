@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmoHeal Study - Post-Experience Questionnaire</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="qmul-header">
+        <div class="qmul-logo">Queen Mary University of London</div>
+        <div class="qmul-subtitle">School of Electronic Engineering and Computer Science</div>
+    </div>
+
+    <div class="container">
+        <div class="progress-steps">
+            <div class="step completed">1</div>
+            <div class="step completed">2</div>
+            <div class="step completed">3</div>
+            <div class="step completed">4</div>
+            <div class="step current">5</div>
+            <div class="step pending">6</div>
+        </div>
+
+        <div class="content-card">
+            <h1>Post-Experience Questionnaire</h1>
+            <h2 style="text-align: center; color: #666;">体验后问卷</h2>
+            
+            <div class="alert alert-info">
+                Thank you for completing the EmoHeal therapy experience! Your feedback is valuable for our research.
+                <br>
+                感谢您完成EmoHeal治疗体验！您的反馈对我们的研究很有价值。
+            </div>
+
+            <form data-study-form="questionnaire">
+                
+                <!-- Part 1: Demographics -->
+                <h2>Part 1: About You / 第一部分：关于您</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Age Group / 年龄组:</label>
+                    <select name="ageGroup" class="form-control" required>
+                        <option value="">Select / 选择</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                        <option value="45-54">45-54</option>
+                        <option value="55-64">55-64</option>
+                        <option value="65+">65+</option>
+                    </select>
+                </div>
+
+                <!-- Part 2: Experience Evaluation -->
+                <h2>Part 2: Experience Evaluation / 第二部分：体验评估</h2>
+                <p style="color: #666; margin-bottom: 30px;">
+                    Please rate your agreement with the following statements on a scale from 1 (Strongly Disagree) to 5 (Strongly Agree).
+                    <br>
+                    请根据1（强烈不同意）到5（强烈同意）的评分标准，对以下陈述进行评分。
+                </p>
+
+                <!-- Question 1 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <strong>Q1.</strong> The AI system accurately understood my emotional state / 
+                        AI系统准确理解了我的情感状态
+                    </label>
+                    <div class="likert-scale">
+                        <div class="scale-label">Strongly Disagree<br>强烈不同意</div>
+                        <div class="scale-options">
+                            <div class="scale-option">
+                                <input type="radio" name="q1_accuracy" value="1" id="q1_1" required>
+                                <label for="q1_1" class="scale-number">1</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q1_accuracy" value="2" id="q1_2">
+                                <label for="q1_2" class="scale-number">2</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q1_accuracy" value="3" id="q1_3">
+                                <label for="q1_3" class="scale-number">3</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q1_accuracy" value="4" id="q1_4">
+                                <label for="q1_4" class="scale-number">4</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q1_accuracy" value="5" id="q1_5">
+                                <label for="q1_5" class="scale-number">5</label>
+                            </div>
+                        </div>
+                        <div class="scale-label">Strongly Agree<br>强烈同意</div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <strong>Q2.</strong> The recommended music was appropriate for my emotional needs / 
+                        推荐的音乐适合我的情感需求
+                    </label>
+                    <div class="likert-scale">
+                        <div class="scale-label">Strongly Disagree<br>强烈不同意</div>
+                        <div class="scale-options">
+                            <div class="scale-option">
+                                <input type="radio" name="q2_appropriateness" value="1" id="q2_1" required>
+                                <label for="q2_1" class="scale-number">1</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q2_appropriateness" value="2" id="q2_2">
+                                <label for="q2_2" class="scale-number">2</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q2_appropriateness" value="3" id="q2_3">
+                                <label for="q2_3" class="scale-number">3</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q2_appropriateness" value="4" id="q2_4">
+                                <label for="q2_4" class="scale-number">4</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q2_appropriateness" value="5" id="q2_5">
+                                <label for="q2_5" class="scale-number">5</label>
+                            </div>
+                        </div>
+                        <div class="scale-label">Strongly Agree<br>强烈同意</div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <strong>Q3.</strong> The overall experience helped me feel more relaxed / 
+                        整体体验帮助我感觉更加放松
+                    </label>
+                    <div class="likert-scale">
+                        <div class="scale-label">Strongly Disagree<br>强烈不同意</div>
+                        <div class="scale-options">
+                            <div class="scale-option">
+                                <input type="radio" name="q3_relaxation" value="1" id="q3_1" required>
+                                <label for="q3_1" class="scale-number">1</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q3_relaxation" value="2" id="q3_2">
+                                <label for="q3_2" class="scale-number">2</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q3_relaxation" value="3" id="q3_3">
+                                <label for="q3_3" class="scale-number">3</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q3_relaxation" value="4" id="q3_4">
+                                <label for="q3_4" class="scale-number">4</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q3_relaxation" value="5" id="q3_5">
+                                <label for="q3_5" class="scale-number">5</label>
+                            </div>
+                        </div>
+                        <div class="scale-label">Strongly Agree<br>强烈同意</div>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <strong>Q4.</strong> I would consider using this type of AI therapy system again / 
+                        我会考虑再次使用这种AI治疗系统
+                    </label>
+                    <div class="likert-scale">
+                        <div class="scale-label">Strongly Disagree<br>强烈不同意</div>
+                        <div class="scale-options">
+                            <div class="scale-option">
+                                <input type="radio" name="q4_reuse" value="1" id="q4_1" required>
+                                <label for="q4_1" class="scale-number">1</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q4_reuse" value="2" id="q4_2">
+                                <label for="q4_2" class="scale-number">2</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q4_reuse" value="3" id="q4_3">
+                                <label for="q4_3" class="scale-number">3</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q4_reuse" value="4" id="q4_4">
+                                <label for="q4_4" class="scale-number">4</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q4_reuse" value="5" id="q4_5">
+                                <label for="q4_5" class="scale-number">5</label>
+                            </div>
+                        </div>
+                        <div class="scale-label">Strongly Agree<br>强烈同意</div>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <strong>Q5.</strong> The user interface was easy to understand and navigate / 
+                        用户界面易于理解和导航
+                    </label>
+                    <div class="likert-scale">
+                        <div class="scale-label">Strongly Disagree<br>强烈不同意</div>
+                        <div class="scale-options">
+                            <div class="scale-option">
+                                <input type="radio" name="q5_usability" value="1" id="q5_1" required>
+                                <label for="q5_1" class="scale-number">1</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q5_usability" value="2" id="q5_2">
+                                <label for="q5_2" class="scale-number">2</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q5_usability" value="3" id="q5_3">
+                                <label for="q5_3" class="scale-number">3</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q5_usability" value="4" id="q5_4">
+                                <label for="q5_4" class="scale-number">4</label>
+                            </div>
+                            <div class="scale-option">
+                                <input type="radio" name="q5_usability" value="5" id="q5_5">
+                                <label for="q5_5" class="scale-number">5</label>
+                            </div>
+                        </div>
+                        <div class="scale-label">Strongly Agree<br>强烈同意</div>
+                    </div>
+                </div>
+
+                <!-- Part 3: Open-ended feedback -->
+                <h2>Part 3: Your Thoughts / 第三部分：您的想法</h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Please share your thoughts in your own words. Your responses can be in English or Chinese.
+                    <br>
+                    请用您自己的话分享您的想法。您可以用英文或中文回答。
+                </p>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <strong>Q6.</strong> What did you like most about the EmoHeal experience? / 
+                        您最喜欢EmoHeal体验的什么方面？
+                    </label>
+                    <textarea name="q6_liked_most" class="form-control" rows="4" 
+                              placeholder="Please share what you found most enjoyable or helpful... / 请分享您觉得最愉快或最有帮助的方面..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <strong>Q7.</strong> What could be improved about the system? / 
+                        系统有哪些方面可以改进？
+                    </label>
+                    <textarea name="q7_improvements" class="form-control" rows="4" 
+                              placeholder="Please suggest any improvements or changes... / 请提出任何改进建议或更改..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <strong>Q8.</strong> Any additional comments or feedback? / 
+                        还有其他意见或反馈吗？
+                    </label>
+                    <textarea name="q8_additional_comments" class="form-control" rows="4" 
+                              placeholder="Feel free to share any other thoughts... / 请随意分享其他想法..."></textarea>
+                </div>
+
+                <div class="alert alert-success">
+                    <strong>Thank you! / 谢谢您！</strong><br>
+                    Your participation and feedback contribute valuable insights to our research on AI-assisted therapeutic systems.
+                    <br>
+                    您的参与和反馈为我们关于AI辅助治疗系统的研究提供了宝贵的见解。
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="alert('治疗体验无法重复。如需重新开始整个研究，请联系研究团队。\nThe therapy experience cannot be repeated. To restart the entire study, please contact the research team.')">
+                        Back / 返回
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Submit Questionnaire / 提交问卷
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-card" style="text-align: center; padding: 1.5rem;">
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 0;">
+                Your responses will be processed anonymously and stored securely according to university data protection policies.
+                <br>
+                您的回答将被匿名处理，并根据大学数据保护政策安全存储。
+            </p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="study_flow.js"></script>
+</body>
+</html>

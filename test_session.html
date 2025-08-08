@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Session Creation</title>
+    <style>
+        body { font-family: Arial; margin: 50px; background: #1a1a1a; color: white; }
+        button { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px; }
+        button:hover { background: #2563eb; }
+        #log { background: #111; padding: 20px; border-radius: 10px; height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .info { color: #74c0fc; }
+    </style>
+</head>
+<body>
+    <h1>疗愈会话创建测试</h1>
+    
+    <button onclick="testWithoutProgress()">测试不带进度的会话创建</button>
+    <button onclick="testWithProgress()">测试带进度的会话创建</button>
+    <button onclick="clearLog()">清空日志</button>
+    
+    <h3>测试日志</h3>
+    <div id="log"></div>
+    
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const className = type;
+            logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        async function testWithoutProgress() {
+            log('开始测试不带进度的会话创建...', 'info');
+            
+            try {
+                // 1. 情感分析
+                log('步骤1: 情感分析...', 'info');
+                const emotionResponse = await fetch(`${API_BASE}/api/emotion/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: '我感到有些焦虑' })
+                });
+                
+                if (!emotionResponse.ok) {
+                    throw new Error(`情感分析失败: ${emotionResponse.status}`);
+                }
+                
+                const emotionData = await emotionResponse.json();
+                log(`情感分析成功: ${JSON.stringify(emotionData, null, 2)}`, 'success');
+                
+                // 2. 音乐检索
+                log('步骤2: 音乐检索...', 'info');
+                const musicResponse = await fetch(`${API_BASE}/api/music/search-text`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: '我感到有些焦虑',
+                        settings: {
+                            duration: '1min',
+                            max_results: 5
+                        }
+                    })
+                });
+                
+                if (!musicResponse.ok) {
+                    throw new Error(`音乐检索失败: ${musicResponse.status}`);
+                }
+                
+                const musicData = await musicResponse.json();
+                log(`音乐检索成功: ${JSON.stringify(musicData, null, 2)}`, 'success');
+                
+            } catch (error) {
+                log(`错误: ${error.message}`, 'error');
+                console.error('完整错误:', error);
+            }
+        }
+        
+        async function testWithProgress() {
+            log('开始测试带进度的会话创建...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/music/search-with-progress`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream',
+                    },
+                    body: JSON.stringify({
+                        query: '我感到有些焦虑',
+                        settings: {
+                            duration: '1min',
+                            max_results: 5
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`SSE请求失败: ${response.status} ${response.statusText}`);
+                }
+                
+                log('SSE连接成功，开始接收进度...', 'success');
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let finalResult = null;
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    
+                    for (const line of lines) {
+                        if (line.trim().startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.trim().substring(6));
+                                log(`进度更新: ${data.step} - ${data.message} (${data.progress}%)`, 'info');
+                                
+                                if (data.step === 'completed' && data.data) {
+                                    finalResult = data.data;
+                                    log(`最终结果: ${JSON.stringify(finalResult, null, 2)}`, 'success');
+                                }
+                                
+                                if (data.step === 'error') {
+                                    throw new Error(data.message);
+                                }
+                            } catch (e) {
+                                log(`解析错误: ${e.message}`, 'error');
+                            }
+                        }
+                    }
+                }
+                
+                if (finalResult) {
+                    log('带进度的会话创建成功完成！', 'success');
+                } else {
+                    log('警告: SSE结束但没有收到最终结果', 'error');
+                }
+                
+            } catch (error) {
+                log(`错误: ${error.message}`, 'error');
+                console.error('完整错误:', error);
+            }
+        }
+    </script>
+</body>
+</html>

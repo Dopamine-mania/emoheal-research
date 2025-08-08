@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmoHeal Study - Thank You</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="qmul-header">
+        <div class="qmul-logo">Queen Mary University of London</div>
+        <div class="qmul-subtitle">School of Electronic Engineering and Computer Science</div>
+    </div>
+
+    <div class="container">
+        <div class="progress-steps">
+            <div class="step completed">1</div>
+            <div class="step completed">2</div>
+            <div class="step completed">3</div>
+            <div class="step completed">4</div>
+            <div class="step completed">5</div>
+            <div class="step current">6</div>
+        </div>
+
+        <div class="content-card">
+            <h1 style="text-align: center; color: #28a745;">🎉 Study Complete!</h1>
+            <h2 style="text-align: center; color: #666;">研究完成！</h2>
+            
+            <div class="alert alert-success">
+                <strong>Thank you for participating in the EmoHeal research study!</strong><br>
+                Your contribution helps advance our understanding of AI-assisted therapeutic systems.
+                <br><br>
+                <strong>感谢您参与EmoHeal研究！</strong><br>
+                您的贡献有助于我们深入理解AI辅助治疗系统。
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <div style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 30px; border-radius: 15px; margin: 20px 0;">
+                    <h2 style="margin-bottom: 15px; color: white;">Study Successfully Completed</h2>
+                    <h3 style="color: white; opacity: 0.9;">研究成功完成</h3>
+                    <p style="font-size: 1.1rem; margin-top: 20px; opacity: 0.9;">
+                        Session ID: <strong id="session-id">Loading...</strong>
+                    </p>
+                </div>
+            </div>
+
+            <h2>What Happens Next? / 接下来会发生什么？</h2>
+            <div style="background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 25px 0;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start;">
+                    <div>
+                        <h3 style="color: #990033; margin-bottom: 15px;">🔬 Research Process</h3>
+                        <ul style="line-height: 1.8;">
+                            <li>Your data has been securely stored</li>
+                            <li>All responses are completely anonymous</li>
+                            <li>Data will contribute to academic research</li>
+                            <li>Results may be published in academic journals</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #990033; margin-bottom: 15px;">🔬 研究流程</h3>
+                        <ul style="line-height: 1.8;">
+                            <li>您的数据已安全存储</li>
+                            <li>所有回答完全匿名</li>
+                            <li>数据将用于学术研究</li>
+                            <li>结果可能发表在学术期刊上</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Data and Privacy / 数据和隐私</h2>
+            <div style="background: #e7f3ff; padding: 20px; border-radius: 10px; border-left: 5px solid #007bff;">
+                <h3 style="color: #007bff; margin-bottom: 15px;">📊 Your Data</h3>
+                <p>
+                    <strong>Storage:</strong> Securely stored on Queen Mary University systems<br>
+                    <strong>Retention:</strong> Until January 2026, then securely destroyed<br>
+                    <strong>Access:</strong> Only accessible to the research team<br>
+                    <strong>Usage:</strong> Academic research purposes only
+                </p>
+                <hr style="margin: 15px 0; border: none; border-top: 1px solid #ccc;">
+                <p>
+                    <strong>存储：</strong> 安全存储在伦敦大学玛丽女王学院系统中<br>
+                    <strong>保留：</strong> 至2026年1月，然后安全销毁<br>
+                    <strong>访问：</strong> 仅研究团队可访问<br>
+                    <strong>使用：</strong> 仅用于学术研究目的
+                </p>
+            </div>
+
+            <h2>Download Your Data / 下载您的数据</h2>
+            <p style="margin-bottom: 20px;">
+                As a participant, you have the right to download a copy of your anonymized data.
+                This file contains your session information and responses in JSON format.
+                <br><br>
+                作为参与者，您有权下载匿名数据的副本。此文件包含JSON格式的会话信息和回答。
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <button onclick="exportData()" class="btn btn-primary" style="font-size: 1.1rem; padding: 15px 30px;">
+                    📁 Download My Anonymous Data / 下载我的匿名数据
+                </button>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                    File format: JSON | No personal identifiers included<br>
+                    文件格式：JSON | 不包含个人识别信息
+                </p>
+            </div>
+
+            <h2>Research Team Contact / 研究团队联系方式</h2>
+            <div style="background: #f8f9fa; padding: 25px; border-radius: 12px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div>
+                        <h3>📧 Questions about this study?</h3>
+                        <p>
+                            <strong>Primary Contact:</strong><br>
+                            Xinchen Wan<br>
+                            Postgraduate student<br>
+                            Email: x.wan@se24.qmul.ac.uk
+                        </p>
+                        <p>
+                            <strong>Supervisor:</strong><br>
+                            Dr. Huan Zhang
+                        </p>
+                    </div>
+                    <div>
+                        <h3>📧 对本研究有疑问？</h3>
+                        <p>
+                            <strong>主要联系人：</strong><br>
+                            万欣辰<br>
+                            硕士生<br>
+                            邮箱：x.wan@se24.qmul.ac.uk
+                        </p>
+                        <p>
+                            <strong>导师：</strong><br>
+                            张欢博士
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info" style="margin: 30px 0;">
+                <strong>🔍 Interested in our research?</strong><br>
+                Follow our work on AI and digital health at Queen Mary University of London.
+                Published results from this study will be made available through academic channels.
+                <br><br>
+                <strong>🔍 对我们的研究感兴趣？</strong><br>
+                关注我们在伦敦大学玛丽女王学院进行的AI和数字健康研究。
+                本研究的发表结果将通过学术渠道提供。
+            </div>
+
+            <div class="btn-group" style="margin-top: 40px;">
+                <button onclick="resetStudy()" class="btn btn-secondary">
+                    🔄 Start New Session / 开始新会话
+                </button>
+                <button onclick="window.close()" class="btn btn-primary">
+                    ✅ Close Window / 关闭窗口
+                </button>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #990033, #b30039); color: white; border-radius: 15px;">
+                <h2 style="color: white; margin-bottom: 20px;">Thank You Once Again!</h2>
+                <h3 style="color: white; opacity: 0.9; margin-bottom: 20px;">再次感谢您！</h3>
+                <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.9;">
+                    Your participation in this research contributes to the advancement of AI-assisted therapeutic technologies 
+                    and helps us better understand how technology can support mental health and wellbeing.
+                    <br><br>
+                    您参与这项研究有助于推进AI辅助治疗技术的发展，帮助我们更好地了解技术如何支持心理健康和福祉。
+                </p>
+            </div>
+        </div>
+
+        <div class="content-card" style="text-align: center; padding: 1.5rem;">
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">
+                <strong>Ethics Reference:</strong> QMERC20.565.DSEECS25.045
+            </p>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 0;">
+                This study has been reviewed and approved by the Queen Mary Ethics of Research Committee.
+                <br>
+                本研究已通过伦敦大学玛丽女王学院研究伦理委员会审批。
+            </p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="study_flow.js"></script>
+    <script>
+        // Display session ID when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const sessionElement = document.getElementById('session-id');
+            if (studyFlow && studyFlow.participantData) {
+                sessionElement.textContent = studyFlow.participantData.sessionId;
+            } else {
+                sessionElement.textContent = 'Not available';
+            }
+        });
+
+        // Override the close function to show a friendly message
+        function closeStudy() {
+            alert('Thank you for participating! You may now close this window.\n感谢您的参与！您现在可以关闭此窗口。');
+        }
+    </script>
+</body>
+</html>

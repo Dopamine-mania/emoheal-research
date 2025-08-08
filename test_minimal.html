@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐疗愈系统 - 极简测试版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #111827;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #9CA3AF;
+            font-size: 0.875rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #1F2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            resize: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3B82F6;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 24px;
+            background-color: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #2563EB;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error {
+            margin-top: 1rem;
+            padding: 12px 16px;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid #EF4444;
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 0.875rem;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 1rem;
+            color: #9CA3AF;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background-color: #000;
+        }
+
+        .test-connection {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .test-connection button {
+            background: none;
+            color: #6B7280;
+            font-size: 0.875rem;
+            padding: 8px 16px;
+            width: auto;
+        }
+
+        .test-connection button:hover {
+            color: #9CA3AF;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 音乐疗愈系统</h1>
+        
+        <div id="input-section">
+            <form id="emotion-form">
+                <div class="form-group">
+                    <label for="emotion">描述您的情绪状态</label>
+                    <textarea 
+                        id="emotion" 
+                        rows="4" 
+                        placeholder="例如：我感到焦虑、需要放松..."
+                        required
+                    ></textarea>
+                </div>
+                <button type="submit" id="submit-btn">查找疗愈音乐</button>
+            </form>
+            
+            <div id="loading" class="loading" style="display: none;">
+                搜索中，请稍候...
+            </div>
+            
+            <div id="error" class="error" style="display: none;"></div>
+        </div>
+
+        <div id="video-section" style="display: none;">
+            <video id="video-player" controls autoplay></video>
+            <button onclick="resetForm()">返回重新选择</button>
+        </div>
+
+        <div class="test-connection">
+            <button onclick="testConnection()">测试后端连接</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+        
+        // 测试后端连接
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                alert(`后端状态: ${data.status}\n消息: ${data.message || '连接成功'}`);
+            } catch (error) {
+                alert('无法连接到后端服务\n请确保后端运行在 http://127.0.0.1:5000');
+            }
+        }
+
+        // 提交表单
+        document.getElementById('emotion-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const emotionText = document.getElementById('emotion').value.trim();
+            if (!emotionText) return;
+
+            // 显示加载状态
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+
+            try {
+                // 调用搜索API
+                const response = await fetch(`${API_BASE}/api/music/search-text`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: emotionText,
+                        settings: {
+                            duration: '3min',
+                            max_results: 1
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`服务器错误: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('API响应:', data);
+
+                // 处理响应 - 适配实际的API响应格式
+                if (data.success && data.data && data.data.segments && data.data.segments.length > 0) {
+                    const video = data.data.segments[0];
+                    const videoPath = video.url || video.video_path || video.path;
+                    if (videoPath) {
+                        // 显示视频
+                        const videoUrl = `${API_BASE}/api/video/${videoPath}`;
+                        showVideo(videoUrl);
+                    } else {
+                        throw new Error('未找到视频路径');
+                    }
+                } else {
+                    throw new Error('未找到匹配的音乐');
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+                showError(error.message);
+            } finally {
+                document.getElementById('submit-btn').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+
+        // 显示视频
+        function showVideo(url) {
+            document.getElementById('input-section').style.display = 'none';
+            document.getElementById('video-section').style.display = 'block';
+            
+            const video = document.getElementById('video-player');
+            video.src = url;
+            
+            // 视频加载错误处理
+            video.onerror = () => {
+                showError('视频加载失败');
+                resetForm();
+            };
+        }
+
+        // 显示错误
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('input-section').style.display = 'block';
+            document.getElementById('video-section').style.display = 'none';
+            document.getElementById('emotion').value = '';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('video-player').src = '';
+        }
+
+        // 页面加载时测试连接
+        window.addEventListener('load', () => {
+            console.log('音乐疗愈系统已准备就绪');
+            console.log('后端API地址:', API_BASE);
+        });
+    </script>
+</body>
+</html>
